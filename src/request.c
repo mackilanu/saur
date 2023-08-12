@@ -36,6 +36,7 @@ void saur_parse_json(char *data) {
     cJSON *json = cJSON_Parse(data);
     char *string = cJSON_Print(json);
     printf("%s", string);
+
     free(string);
     cJSON_Delete(json);
 }
@@ -45,7 +46,7 @@ void saur_get_json_response(char *url) {
     struct memory chunk = {0};
 
     if(curl) {
-        char test[4096] = SAUR_AUR_BASE_URL;
+        char test[1024] = SAUR_AUR_BASE_URL;
         strcat(test, url);
 
         curl_easy_setopt(curl, CURLOPT_URL, test);
@@ -56,7 +57,7 @@ void saur_get_json_response(char *url) {
         curl_easy_perform(curl);
         
         saur_parse_json(chunk.response);
-        //printf("%d", res);
+
         curl_easy_cleanup(curl);
 
         free(chunk.response);
