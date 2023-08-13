@@ -28,7 +28,6 @@ centaur_pkg_list_item *centaur_pkg_list_item_at(centaur_pkg_list *l, int index) 
 }
 
 void centaur_pkg_list_free(centaur_pkg_list *l) {
-
     for(int i = 0; i < l->size; i++) {
         free(centaur_pkg_list_item_at(l, i));
     }
