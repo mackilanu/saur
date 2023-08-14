@@ -35,12 +35,27 @@ size_t write_data(void *buffer, size_t size, size_t nmemb, void *clientp) {
 }
 
 
-int saur_parse_json(char *data) {
+
+/**
+ * Copy an entire string from src to dest.
+ * */
+void _centaur_cpy_string(char *dest, char *src) {
+
+    for(; *src; src++, dest++) {
+        *dest = *src;
+    }
+
+    *dest = '\0';
+}
+
+
+centaur_pkg_list *_centaur_parse_json(char *data) {
     int status = 0;
     cJSON *json = cJSON_Parse(data);
     const cJSON *results  = NULL;
     const cJSON *result = NULL;
 
+    centaur_pkg_list *l = centaur_pkg_list_init(1);
 
     if(json == NULL) {
         const char *error_ptr = cJSON_GetErrorPtr();
@@ -52,39 +67,40 @@ int saur_parse_json(char *data) {
         results = cJSON_GetObjectItemCaseSensitive(json, "results");
         int row = 1;
 
-        centaur_pkg_list *l = centaur_pkg_list_init(1);
         cJSON_ArrayForEach(result, results) {
             cJSON *name = cJSON_GetObjectItemCaseSensitive(result, "Name");
             cJSON *popularity = cJSON_GetObjectItemCaseSensitive(result, "Popularity");
             cJSON *desc = cJSON_GetObjectItemCaseSensitive(result, "Description");
+            cJSON *urlpath = cJSON_GetObjectItemCaseSensitive(result, "URLPath");
 
             centaur_pkg_list_item *item = malloc(sizeof(*item));
 
-            item->name = name->valuestring;
+            item->name = malloc(strlen(name->valuestring) + 1);
+            item->description = malloc(strlen(desc->valuestring) + 1);
+            item->urlpath= malloc(strlen(urlpath->valuestring) + 1);
+
+            _centaur_cpy_string(item->name, name->valuestring);
+            _centaur_cpy_string(item->description, desc->valuestring);
+            _centaur_cpy_string(item->urlpath, urlpath->valuestring);
+
             item->popularity = popularity->valuedouble;
-            item->description = desc->valuestring;
 
             centaur_pkg_list_insert(l, item);
-            //printf("%d) %s (%2f)\n\t%s\n",row, name->valuestring, popularity->valuedouble, desc->valuestring); /* Print a packag */
             row++;
         }
 
-
-
+        cJSON_Delete(json);
         for(int i = 0; i < centaur_pkg_list_size(l); i++) {
-            printf("%s\n", centaur_pkg_list_item_at(l, i)->name);
+            printf("%d:: %s\n", i, centaur_pkg_list_item_at(l, i)->description);
         }
-        centaur_pkg_list_free(l);
     }
 
-    cJSON_Delete(json);
-
-    return status;
-
+    return l;
 }
 
-void centaur_get_json_response(char *url) {
+centaur_pkg_list *centaur_rpc_search(char *url) {
     CURL *curl = curl_easy_init();
+    centaur_pkg_list *l; 
     struct memory chunk = {0};
 
     if(curl) {
@@ -98,12 +114,12 @@ void centaur_get_json_response(char *url) {
 
         curl_easy_perform(curl);
         
-        int stats = saur_parse_json(chunk.response);
-
-
+        l = _centaur_parse_json(chunk.response);
         curl_easy_cleanup(curl);
 
         free(chunk.response);
     }
+
+    return l;
 }
 

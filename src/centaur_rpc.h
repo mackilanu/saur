@@ -5,7 +5,7 @@
 #define SAUR_AUR_BASE_URL "https://aur.archlinux.org/rpc/v5/search/"
 
 #include <stdlib.h>
+#include "centaur_pkg_list.h"
 
-void centaur_get_json_response(char *url);
-
+centaur_pkg_list *centaur_rpc_search(char *url);
 #endif

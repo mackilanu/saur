@@ -12,6 +12,7 @@ struct centaur_pkg_list_item {
     char *description;
     double popularity;
     int votes;
+    char *urlpath;
 };
 
 

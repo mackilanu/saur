@@ -14,13 +14,16 @@ int main(int argc, char *argv[])
         fprintf(stderr, "error: too many arguments\n");
         return EXIT_FAILURE;
     }
-    
+   
+    centaur_pkg_list *l = NULL;
+
     if(strcmp(argv[1], "search") == 0) {
-        centaur_get_json_response(argv[2]);
+       l = centaur_rpc_search(argv[2]);
     } else if(strcmp(argv[1], "install") == 0) {
         //install a package
     }
 
-    //saur_get_json_response("jetbrains?by=name");
+    centaur_pkg_list_free(l);
+
     return EXIT_SUCCESS;
 }
