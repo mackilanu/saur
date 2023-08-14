@@ -72,27 +72,37 @@ centaur_pkg_list *_centaur_parse_json(char *data) {
             cJSON *popularity = cJSON_GetObjectItemCaseSensitive(result, "Popularity");
             cJSON *desc = cJSON_GetObjectItemCaseSensitive(result, "Description");
             cJSON *urlpath = cJSON_GetObjectItemCaseSensitive(result, "URLPath");
+            cJSON *votes = cJSON_GetObjectItemCaseSensitive(result, "NumVotes");
 
             centaur_pkg_list_item *item = malloc(sizeof(*item));
 
-            item->name = malloc(strlen(name->valuestring) + 1);
-            item->description = malloc(strlen(desc->valuestring) + 1);
-            item->urlpath= malloc(strlen(urlpath->valuestring) + 1);
+            item->name = NULL;
+            item->urlpath = NULL;
+            item->description = NULL;
 
-            _centaur_cpy_string(item->name, name->valuestring);
-            _centaur_cpy_string(item->description, desc->valuestring);
-            _centaur_cpy_string(item->urlpath, urlpath->valuestring);
+            if(name->valuestring != NULL) {
+                item->name = malloc(strlen(name->valuestring) + 1);
+                _centaur_cpy_string(item->name, name->valuestring);
+            }
+
+            if(desc->valuestring != NULL) {
+                item->description = malloc(strlen(desc->valuestring) + 1);
+                _centaur_cpy_string(item->description, desc->valuestring);
+            }
+
+            if(urlpath->valuestring != NULL) {
+                item->urlpath = malloc(strlen(urlpath->valuestring) + 1);
+                _centaur_cpy_string(item->urlpath, urlpath->valuestring);
+            }
 
             item->popularity = popularity->valuedouble;
+            item->votes = votes->valueint;
 
             centaur_pkg_list_insert(l, item);
             row++;
         }
 
         cJSON_Delete(json);
-        for(int i = 0; i < centaur_pkg_list_size(l); i++) {
-            printf("%d:: %s\n", i, centaur_pkg_list_item_at(l, i)->description);
-        }
     }
 
     return l;

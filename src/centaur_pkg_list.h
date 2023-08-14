@@ -19,6 +19,8 @@ struct centaur_pkg_list_item {
 centaur_pkg_list *centaur_pkg_list_init(size_t init_size);
 centaur_pkg_list *centaur_pkg_list_insert(centaur_pkg_list *l, centaur_pkg_list_item *item);
 centaur_pkg_list_item *centaur_pkg_list_item_at(centaur_pkg_list *l, int index);
+
+void centaur_pkg_print(centaur_pkg_list *l);
 int centaur_pkg_list_size(centaur_pkg_list *l);
 void centaur_pkg_list_free(centaur_pkg_list *l);
 
